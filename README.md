@@ -13,21 +13,21 @@ Note:
 
 ## Compile and Package Command:
 
-  mvn clean package
+  `mvn clean package`
 
   This would create a WAR file and copy to the path configured in property <war.output.dir> in pom.xml
 
 ## Start Server:
 
-<apache_tomcat_home>/bin$ ./startup.sh
+`<apache_tomcat_home>/bin$ ./startup.sh`
 
 ## Stop Server:
 
-<apache_tomcat_home>/bin$ ./shutdown.sh
+`<apache_tomcat_home>/bin$ ./shutdown.sh`
 
 ## Access Application:
 
-  http://localhost:8080/epicor-web-service/parts/
+  `http://localhost:8080/epicor-web-service/parts/`
   
   This should display "Welcome"
 
