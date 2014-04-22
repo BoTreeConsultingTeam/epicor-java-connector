@@ -1,0 +1,104 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.dehinsystems.api.epicor</groupId>
+  <artifactId>epicor-java-connector</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>war</packaging>
+  <name>Epicor Java Connector</name>
+  <description>Epicor Java Connector by Dehin Systems</description>
+
+  <properties>
+    <spring.version>4.0.3.RELEASE</spring.version>
+    <war.output.dir>/media/work/Environment/WebServers/apache-tomcat-7.0.27/webapps</war.output.dir>
+    <war.name>epicor-web-service</war.name>
+    <custom.lib.dir>${project.basedir}/WebContent/WEB-INF/lib</custom.lib.dir>
+  </properties>
+
+
+  <dependencies>
+    <!-- CUSTOM DEPENDENCIES -->
+    <dependency>
+        <groupId>ePartExpert</groupId>
+        <artifactId>ePartExpert</artifactId>
+        <version>1.11.5</version>
+        <scope>system</scope>
+        <systemPath>${custom.lib.dir}/ePartExpert.jar</systemPath>
+    </dependency>
+
+    <dependency>
+        <groupId>jintegra</groupId>
+        <artifactId>jintegra</artifactId>
+        <version>2.12</version>
+        <scope>system</scope>
+        <systemPath>${custom.lib.dir}/jintegra.jar</systemPath>
+    </dependency>
+
+    <!-- SPRING FRAMEWORK DEPENDENCIES -->
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-webmvc</artifactId>
+        <version>${spring.version}</version>
+    </dependency>
+
+    <!-- JAVA SERVLET API -->
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>servlet-api</artifactId>
+        <version>2.5</version>
+    </dependency>
+
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>jstl</artifactId>
+        <version>1.2</version>
+    </dependency>
+
+    <dependency>
+        <groupId>javax.servlet.jsp</groupId>
+        <artifactId>jsp-api</artifactId>
+        <version>2.2</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.1</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <warSourceDirectory>WebContent</warSourceDirectory>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <outputDirectory>${war.output.dir}</outputDirectory>
+          <packagingExcludes>
+                WEB-INF/lib/servlet-api*.jar,
+                WEB-INF/lib/jsp-api*.jar,
+                WEB-INF/lib/jstl-api*.jar
+          </packagingExcludes>
+          <warName>${war.name}</warName>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

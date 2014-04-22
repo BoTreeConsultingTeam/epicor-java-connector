@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
+  <display-name>Epicor Web Service By Dehin Systems</display-name>
+
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>/WEB-INF/epicor-web-service-servlet.xml</param-value>
+  </context-param>
+
+  <!--
+        Loads the root application context(s) as defined by context-param
+        "contextConfigLocation".THIS GETS LOADED FIRST.
+        It is recommended that the services, dao and other utility beans
+        are defined in this global context.
+
+        Dispatcher servlet should load only the context defining
+        web-related beans like controllers, views etc.
+   -->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+  <!-- Handles all requests into the application -->
+  <servlet>
+    <servlet-name>epicor-web-service</servlet-name>
+     <!--
+        By default looks for its own application context in location
+        /WEB-INF/<SERVLET_NAME>-servlet.xml.For e.g. in this case
+        this would load the beans from "epicor-web-service-servlet.xml"
+
+        This gets loaded AFTER org.springframework.web.context.ContextLoaderListener
+        loads the contexts defined by context-param "contextConfigLocation".
+      -->
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>epicor-web-service</servlet-name>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+
+</web-app>
