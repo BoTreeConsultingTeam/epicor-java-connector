@@ -3,7 +3,7 @@ epicor-java-connector
 
 Note: 
 
-* All paths//folders/files mentioned are relative to project's base directory, unless mentioned explicitly.
+* All paths/folders/files mentioned are relative to project's base directory, unless mentioned explicitly.
 
 
 ## Config Changes:
