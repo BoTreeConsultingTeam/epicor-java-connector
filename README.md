@@ -1,7 +1,13 @@
 epicor-java-connector
 =====================
 
-Note: 
+**Pre-requisites** (*unless specified explicitly use the latest stable release*):
+
+* Sun Java JDK
+* Apache Maven
+* Apache Tomcat
+
+**Note**: 
 
 * All paths/folders/files mentioned are relative to project's base directory, unless mentioned explicitly.
 
