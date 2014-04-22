@@ -9,7 +9,7 @@ Note:
 ## Config Changes:
 
 1. Open pom.xml
-2. Replace the path for property <war.output.dir> with your local Apache Tomcat's webapps path.
+2. Replace the path configured in property <war.output.dir> with your local Apache Tomcat's `webapps` folder path.
 
 ## Compile and Package Command:
 
