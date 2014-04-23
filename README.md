@@ -21,7 +21,7 @@ epicor-java-connector
 
   `mvn clean package`
 
-  This would create a WAR file and copy to the path configured in property <war.output.dir> in pom.xml
+  This would create a WAR file and copy to the path configured in property `war.output.dir` in pom.xml
 
 ## Start Server:
 
