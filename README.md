@@ -35,5 +35,15 @@ epicor-java-connector
 
   `http://localhost:8080/epicor-web-service/parts/`
   
-  This should display **Welcome**
+  This should return a dummy JSON for now:
+  
+  ```
+  [
+    {
+      "uniqueId": "test-id",
+      "name": "test part",
+      "description": "test part description"
+    }
+  ]
+  ```
 
