@@ -15,7 +15,7 @@ public class ManufacturerItem {
 	
 	private String OrderNumber;
 	
-	private List<InterItem> interItems;
+	private List<PartRecordDetails> interItems;
 
 	/**
 	 * @return the lineCodes
@@ -45,11 +45,11 @@ public class ManufacturerItem {
 		OrderNumber = orderNumber;
 	}
 
-	public List<InterItem> getInterItems() {
+	public List<PartRecordDetails> getInterItems() {
 		return interItems;
 	}
 
-	public void setInterItems(List<InterItem> interItems) {
+	public void setInterItems(List<PartRecordDetails> interItems) {
 		this.interItems = interItems;
 	}
 	

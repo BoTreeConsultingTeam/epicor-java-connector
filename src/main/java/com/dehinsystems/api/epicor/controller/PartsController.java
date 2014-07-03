@@ -2,6 +2,7 @@ package com.dehinsystems.api.epicor.controller;
 
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -19,8 +20,12 @@ import com.ccitriad.catalog.interchange.InterCatalog;
 import com.ccitriad.catalog.interchange.InterItem;
 import com.ccitriad.catalog.interchange.InterPartNumber;
 import com.ccitriad.catalog.interchange.InterPartNumbers;
+import com.ccitriad.catalog.parts.LocalC2C;
+import com.ccitriad.catalog.parts.PartCatalog;
 import com.dehinsystems.api.epicor.model.CatalogItem;
+import com.dehinsystems.api.epicor.model.LocalCover2Cover;
 import com.dehinsystems.api.epicor.model.ManufacturerItem;
+import com.dehinsystems.api.epicor.model.PartRecordDetails;
 
 @RestController
 @RequestMapping("/parts/")
@@ -39,18 +44,76 @@ public class PartsController {
 	private static final String HOST_IP = "192.168.108.117";
 	
 	private static final String EMPTY = "";
+	
+	private LocalCover2Cover getCoverToCoverDetailsFromPartNumber(final String partNumber) {
+		try {
+			PartCatalog partCatalog = new PartCatalog(HOST_IP, DOMAIN_ID, USER_NAME, PASSWORD, SUPPLIER_ID, SERVICE_TYPE);
+			LocalC2C localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null, null, null);
+			return localC2C != null ? populateLocalCover2Cover(localC2C) : null;			
+		} catch (CatalogException | IOException e) {
+			return null;
+		} 
+	}
+
+	private LocalCover2Cover populateLocalCover2Cover(LocalC2C localC2C) {
+		LocalCover2Cover localCover2Cover = new LocalCover2Cover();
+		localCover2Cover.setPartNumber(localC2C.getPartNumber());
+		localCover2Cover.setC2cURL(localC2C.getC2CURL());
+		localCover2Cover.setImageLibrary(localC2C.getImageLibrary());
+		localCover2Cover.setLineCode(localC2C.getLineCode());
+		localCover2Cover.setOrderNumber(localC2C.getOrderNumber());
+		localCover2Cover.setThumbnailFile(localC2C.getThumbnailFile());
+		return localCover2Cover;
+	}
 
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "/srchprdet/{partNumber}", method = RequestMethod.GET, headers="Accept=application/json")
 	public CatalogItem getPrimaryDetailsFromPartNum(@PathVariable String partNumber) {
+		InterCatalog interCatalog = null;
 		try {
-			InterCatalog interCatalog = new InterCatalog(HOST_IP, DOMAIN_ID, USER_NAME, PASSWORD, SUPPLIER_ID, SERVICE_TYPE);
+			interCatalog = new InterCatalog(HOST_IP, DOMAIN_ID, USER_NAME, PASSWORD, SUPPLIER_ID, SERVICE_TYPE);
 			List primaryDetails = getPartPrimaryDetails(interCatalog, partNumber);
 			CatalogItem catalogItem = primaryDetails != null ? populateCatalogItemPrimaryInfo(partNumber, primaryDetails) : null;
 			if(catalogItem == null) {
 				catalogItem = new CatalogItem();
 				catalogItem.setPartNumber(partNumber);
 				catalogItem.setErrorMessage("No Primary Details Found !!");
+			} else {
+				catalogItem.setErrorMessage(EMPTY);
+			}
+			return catalogItem;
+		} catch (CatalogException | IOException e) {
+			CatalogItem catalogItem = new CatalogItem();
+			if(e instanceof IOException || e instanceof CatalogException) {
+				catalogItem.setErrorMessage("Unable to connect to server. Please check internet connectivity.");
+			}
+			return catalogItem;
+		} finally {
+			if(interCatalog != null) {
+				try {
+					interCatalog.DisconnectCatalogServer();
+				} catch (CatalogException | IOException e) {
+					CatalogItem catalogItem = new CatalogItem();
+					if(e instanceof IOException || e instanceof CatalogException) {
+						catalogItem.setErrorMessage("Unable to close the connection to EpiCore.");
+					}
+					return catalogItem;
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value = "/searchSecDetails/{partNumber}", method = RequestMethod.GET, headers="Accept=application/json")
+	public CatalogItem getSecondaryDetailsFromPartNum(@PathVariable String partNumber) {
+		try {
+			InterCatalog interCatalog = new InterCatalog(HOST_IP, DOMAIN_ID, USER_NAME, PASSWORD, SUPPLIER_ID, SERVICE_TYPE);
+			List primaryDetails = getPartSecondaryDetails(interCatalog, partNumber);
+			CatalogItem catalogItem = primaryDetails != null ? populateCatalogItemPrimaryInfo(partNumber, primaryDetails) : null;
+			if(catalogItem == null) {
+				catalogItem = new CatalogItem();
+				catalogItem.setPartNumber(partNumber);
+				catalogItem.setErrorMessage("No Secondary Details Found !!");
 			} else {
 				catalogItem.setErrorMessage(EMPTY);
 			}
@@ -118,9 +181,12 @@ public class PartsController {
 	 * @param pno
 	 * @param primaryDetails
 	 * @return
+	 * @throws IOException 
+	 * @throws CatalogException 
+	 * @throws UnknownHostException 
 	 */
     @SuppressWarnings("rawtypes")
-    private CatalogItem populateCatalogItemPrimaryInfo(String pno, List primaryDetails) {
+    private CatalogItem populateCatalogItemPrimaryInfo(String pno, List primaryDetails) throws UnknownHostException, CatalogException, IOException {
     	CatalogItem catalogItem = null;
     	if (primaryDetails instanceof ICatalogItems) {
     		catalogItem = new CatalogItem();
@@ -130,7 +196,7 @@ public class PartsController {
     		Iterator it = primaryDetails.iterator();
     		Object primaryDetail;
     		List<ManufacturerItem> allManufacturerItems = new ArrayList<ManufacturerItem>(0);
-    		List<com.dehinsystems.api.epicor.model.InterItem> allInterItems = new ArrayList<com.dehinsystems.api.epicor.model.InterItem>(0);
+    		List<PartRecordDetails> allInterItems = new ArrayList<PartRecordDetails>(0);
     		while (it.hasNext()) {
     			primaryDetail = it.next();
     			if (primaryDetail instanceof IManufacturerItem) {
@@ -139,16 +205,18 @@ public class PartsController {
     			}
     			
     			if (primaryDetail instanceof InterItem) {
-    				com.dehinsystems.api.epicor.model.InterItem interItem = populateInterItem(primaryDetail);
+    				PartRecordDetails interItem = populatePartRecordDetails(primaryDetail);
     				allInterItems.add(interItem);
     			}
     		}
     		
     		for(ManufacturerItem mItem : allManufacturerItems) {
     			String mLineCode = mItem.getLineCodes();
-    			List<com.dehinsystems.api.epicor.model.InterItem> interItems = new ArrayList<com.dehinsystems.api.epicor.model.InterItem>(0);
-    			for(com.dehinsystems.api.epicor.model.InterItem interItem : allInterItems) {
+    			List<PartRecordDetails> interItems = new ArrayList<PartRecordDetails>(0);
+    			for(PartRecordDetails interItem : allInterItems) {
     				if(interItem.getLineCodes().equals(mLineCode)) {
+    					LocalCover2Cover localC2C = getCoverToCoverDetailsFromPartNumber(interItem.getPartNumber());
+    					interItem.setLocalCover2Cover(localC2C);
     					interItems.add(interItem);
     				}
     			}
@@ -166,25 +234,27 @@ public class PartsController {
      * @return
      */
 	@SuppressWarnings("rawtypes")
-	private com.dehinsystems.api.epicor.model.InterItem populateInterItem(Object primaryDetail) {
-		InterItem ii = (InterItem) primaryDetail;
-		com.dehinsystems.api.epicor.model.InterItem interItem = new com.dehinsystems.api.epicor.model.InterItem();
-		interItem.setDescription(ii.getDescription() != null ? ii.getDescription() : EMPTY);
-		interItem.setExtendedDescription(ii.getExtendedDescription() != null ? ii.getExtendedDescription() : EMPTY);
-		interItem.setPartNumber(ii.getPartNumber() != null ? ii.getPartNumber() : EMPTY);
-		interItem.setUncompressedPartNumber(ii.getUncompressedPartNumber() != null ? ii.getUncompressedPartNumber() : EMPTY);
-		interItem.setMfgName(ii.getmfgName() != null ? ii.getmfgName() : EMPTY);
-		interItem.setYears(ii.getYears() != null ? ii.getYears() : EMPTY);
+	private PartRecordDetails populatePartRecordDetails(Object primaryDetail) {
+		InterItem interItem = (InterItem) primaryDetail;
+		PartRecordDetails partRecordDets = new PartRecordDetails();
+		partRecordDets.setDescription(interItem.getDescription() != null ? interItem.getDescription() : EMPTY);
+		partRecordDets.setExtendedDescription(interItem.getExtendedDescription() != null ? interItem.getExtendedDescription() : EMPTY);
+		partRecordDets.setPartNumber(interItem.getPartNumber() != null ? interItem.getPartNumber() : EMPTY);
+		partRecordDets.setUncompressedPartNumber(interItem.getUncompressedPartNumber() != null ? interItem.getUncompressedPartNumber() : EMPTY);
+		partRecordDets.setMfgName(interItem.getmfgName() != null ? interItem.getmfgName() : EMPTY);
+		partRecordDets.setYears(interItem.getYears() != null ? interItem.getYears() : EMPTY);
 		
 		StringBuilder lineCodes = new StringBuilder();
-		Iterator itii = ii.getLineCodes();
+		Iterator itii = interItem.getLineCodes();
 		while (itii.hasNext()) {
 			lineCodes.append(itii.next());
 		}
-		interItem.setLineCodes(lineCodes.length() > 0 ? lineCodes.toString() : EMPTY);
-		interItem.setCatalogLineCode(ii.getCatalogLineCode() != null ? ii.getCatalogLineCode() : EMPTY);
-		interItem.setGenericDescription(ii.getGenericDescription() != null ? ii.getGenericDescription() : EMPTY);
-		return interItem;
+		
+		partRecordDets.setLineCodes(lineCodes.length() > 0 ? lineCodes.toString() : EMPTY);
+		partRecordDets.setCatalogLineCode(interItem.getCatalogLineCode() != null ? interItem.getCatalogLineCode() : EMPTY);
+		partRecordDets.setGenericDescription(interItem.getGenericDescription() != null ? interItem.getGenericDescription() : EMPTY);
+		partRecordDets.setListPrice(interItem.getListPrice() != null ? interItem.getListPrice() : EMPTY);
+		return partRecordDets;
 	}
 	
 	/**
@@ -212,6 +282,23 @@ public class PartsController {
     private List getPartPrimaryDetails(InterCatalog interCatalog, String pno) {
 		try {
 			return interCatalog.InterchangePrimary(pno);
+		} catch (CatalogException e) {
+			System.out.println(e.getMessage());
+			return null;
+		}
+	}
+	
+	/**
+	 * Returns the list of Secondary Details for the given part number.
+	 * 
+	 * @param interCatalog
+	 * @param pno
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+    private List getPartSecondaryDetails(InterCatalog interCatalog, String pno) {
+		try {
+			return interCatalog.InterchangeSecondary(pno);
 		} catch (CatalogException e) {
 			System.out.println(e.getMessage());
 			return null;
