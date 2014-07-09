@@ -3,6 +3,8 @@
  */
 package com.dehinsystems.api.epicor.model;
 
+import java.util.List;
+
 /**
  * @author tgbaxi
  *
@@ -20,6 +22,8 @@ public class LocalCover2Cover {
 	private String imageLibrary;
 	
 	private String thumbnailFile;
+	
+	private List<String> imageUrls;
 
 	public String getPartNumber() {
 		return partNumber;
@@ -67,5 +71,13 @@ public class LocalCover2Cover {
 
 	public void setThumbnailFile(String thumbnailFile) {
 		this.thumbnailFile = thumbnailFile;
+	}
+
+	public List<String> getImageUrls() {
+		return imageUrls;
+	}
+
+	public void setImageUrls(List<String> imageUrls) {
+		this.imageUrls = imageUrls;
 	}
 }

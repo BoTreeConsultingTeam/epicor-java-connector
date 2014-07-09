@@ -26,6 +26,7 @@ import com.dehinsystems.api.epicor.model.CatalogItem;
 import com.dehinsystems.api.epicor.model.LocalCover2Cover;
 import com.dehinsystems.api.epicor.model.ManufacturerItem;
 import com.dehinsystems.api.epicor.model.PartRecordDetails;
+import com.dehinsystems.api.epicor.util.HtmlScrapper;
 
 @RestController
 @RequestMapping("/parts/")
@@ -55,7 +56,7 @@ public class PartsController {
 		} 
 	}
 
-	private LocalCover2Cover populateLocalCover2Cover(LocalC2C localC2C) {
+	private LocalCover2Cover populateLocalCover2Cover(LocalC2C localC2C) throws IOException {
 		LocalCover2Cover localCover2Cover = new LocalCover2Cover();
 		localCover2Cover.setPartNumber(localC2C.getPartNumber());
 		localCover2Cover.setC2cURL(localC2C.getC2CURL());
@@ -63,6 +64,11 @@ public class PartsController {
 		localCover2Cover.setLineCode(localC2C.getLineCode());
 		localCover2Cover.setOrderNumber(localC2C.getOrderNumber());
 		localCover2Cover.setThumbnailFile(localC2C.getThumbnailFile());
+		if(localC2C.getC2CURL() != null) {
+			List<String> imageUrls = HtmlScrapper.fetchImageUrls(localC2C.getC2CURL());
+			localCover2Cover.setImageUrls(imageUrls);
+		}
+		
 		return localCover2Cover;
 	}
 
