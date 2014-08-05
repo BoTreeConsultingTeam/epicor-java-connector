@@ -28,6 +28,7 @@ import com.dehinsystems.api.epicor.model.ManufacturerItem;
 import com.dehinsystems.api.epicor.model.PartRecordDetails;
 import com.dehinsystems.api.epicor.util.HtmlScrapper;
 
+@Deprecated
 @RestController
 @RequestMapping("/parts/")
 public class PartsController {
