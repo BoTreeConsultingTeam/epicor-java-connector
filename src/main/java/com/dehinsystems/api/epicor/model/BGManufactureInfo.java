@@ -1,6 +1,5 @@
 package com.dehinsystems.api.epicor.model;
 
-import java.util.List;
 
 public class BGManufactureInfo {
 
@@ -10,7 +9,7 @@ public class BGManufactureInfo {
 	
 	private String discriptorText;
 	
-	private List<BGDataWithMfgWithCoverageInfo> lstBgDataForMfg;
+	private ManufacturerDetails mfgDetails;
 
 	public String getManufactureName() {
 		return manufactureName;
@@ -35,20 +34,19 @@ public class BGManufactureInfo {
 	public void setDiscriptorText(String discriptorText) {
 		this.discriptorText = discriptorText;
 	}
-	
-	public List<BGDataWithMfgWithCoverageInfo> getLstBgDataForMfg() {
-		return lstBgDataForMfg;
+
+	public ManufacturerDetails getMfgDetails() {
+		return mfgDetails;
 	}
 
-	public void setLstBgDataForMfg(List<BGDataWithMfgWithCoverageInfo> lstBgDataForMfg) {
-		this.lstBgDataForMfg = lstBgDataForMfg;
+	public void setMfgDetails(ManufacturerDetails mfgDetails) {
+		this.mfgDetails = mfgDetails;
 	}
 
 	@Override
 	public String toString() {
 		return "BGManufactureInfo [manufactureName=" + manufactureName
 				+ ", orderNumber=" + orderNumber + ", discriptorText="
-				+ discriptorText + ", lstBgDataForMfg=" + lstBgDataForMfg + "]";
-	}
-	
+				+ discriptorText + ", mfgDetails=" + mfgDetails + "]";
+	}	
 }

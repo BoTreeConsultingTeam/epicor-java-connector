@@ -1,12 +1,7 @@
 package com.dehinsystems.api.epicor.model;
 
-public class BGDataWithMfgWithCoverageInfo {
+public class CompatibilityInfo {
 
-	private String manufacturer;
-	private String groupNumber;
-	private String groupText;
-	private String partDescText;
-	private String partDescID;
 	private String fromYear;
 	private String toYear;
 	private String numApps;
@@ -23,50 +18,8 @@ public class BGDataWithMfgWithCoverageInfo {
 	private String specCode3;
 	private String specCode4;
 	private String detailsText;
-	private String lineCode;
-	private String orderNumber;
 	private String lineDescription;
-
-	public String getManufacturer() {
-		return manufacturer;
-	}
-
-	public void setManufacturer(String manufacturer) {
-		this.manufacturer = manufacturer;
-	}
-
-	public String getGroupNumber() {
-		return groupNumber;
-	}
-
-	public void setGroupNumber(String groupNumber) {
-		this.groupNumber = groupNumber;
-	}
-
-	public String getGroupText() {
-		return groupText;
-	}
-
-	public void setGroupText(String groupText) {
-		this.groupText = groupText;
-	}
-
-	public String getPartDescText() {
-		return partDescText;
-	}
-
-	public void setPartDescText(String partDescText) {
-		this.partDescText = partDescText;
-	}
-
-	public String getPartDescID() {
-		return partDescID;
-	}
-
-	public void setPartDescID(String partDescID) {
-		this.partDescID = partDescID;
-	}
-
+	
 	public String getFromYear() {
 		return fromYear;
 	}
@@ -195,22 +148,6 @@ public class BGDataWithMfgWithCoverageInfo {
 		this.detailsText = detailsText;
 	}
 
-	public String getLineCode() {
-		return lineCode;
-	}
-
-	public void setLineCode(String lineCode) {
-		this.lineCode = lineCode;
-	}
-
-	public String getOrderNumber() {
-		return orderNumber;
-	}
-
-	public void setOrderNumber(String orderNumber) {
-		this.orderNumber = orderNumber;
-	}
-
 	public String getLineDescription() {
 		return lineDescription;
 	}
@@ -221,10 +158,7 @@ public class BGDataWithMfgWithCoverageInfo {
 
 	@Override
 	public String toString() {
-		return "BGDataWithMfgWithCoverageInfo [manufacturer=" + manufacturer
-				+ ", groupNumber=" + groupNumber + ", groupText=" + groupText
-				+ ", partDescText=" + partDescText + ", partDescID="
-				+ partDescID + ", fromYear=" + fromYear + ", toYear=" + toYear
+		return "CompatibilityInfo [fromYear=" + fromYear + ", toYear=" + toYear
 				+ ", numApps=" + numApps + ", perCarQty=" + perCarQty
 				+ ", addDate=" + addDate + ", makeText=" + makeText
 				+ ", makeCode=" + makeCode + ", modelText=" + modelText
@@ -232,8 +166,6 @@ public class BGDataWithMfgWithCoverageInfo {
 				+ ", engineCode=" + engineCode + ", specCode1=" + specCode1
 				+ ", specCode2=" + specCode2 + ", specCode3=" + specCode3
 				+ ", specCode4=" + specCode4 + ", detailsText=" + detailsText
-				+ ", lineCode=" + lineCode + ", orderNumber=" + orderNumber
 				+ ", lineDescription=" + lineDescription + "]";
 	}
-
 }
