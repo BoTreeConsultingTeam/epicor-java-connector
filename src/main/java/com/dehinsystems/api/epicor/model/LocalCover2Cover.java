@@ -80,4 +80,13 @@ public class LocalCover2Cover {
 	public void setImageUrls(List<String> imageUrls) {
 		this.imageUrls = imageUrls;
 	}
+
+	@Override
+	public String toString() {
+		return "LocalCover2Cover [partNumber=" + partNumber + ", c2cURL="
+				+ c2cURL + ", lineCode=" + lineCode + ", orderNumber="
+				+ orderNumber + ", imageLibrary=" + imageLibrary
+				+ ", thumbnailFile=" + thumbnailFile + ", imageUrls="
+				+ imageUrls + "]";
+	}
 }
