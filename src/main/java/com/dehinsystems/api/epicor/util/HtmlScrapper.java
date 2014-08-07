@@ -31,7 +31,7 @@ public class HtmlScrapper {
 	  return imageUrls;
   }
   
-  /*public static void main(String[] args) throws IOException {
+  public static void main(String[] args) throws IOException {
     String url = "http://c2c.activant.com/ctoc/index.jsp?ID=ZBS1rACQiPnNlKFN9CEIKeWxBG1R0BVABGwAA";
     Document doc = Jsoup.connect(url).get();
     Elements media = doc.select("[src]");
@@ -42,5 +42,5 @@ public class HtmlScrapper {
         System.out.println(src.tagName() + " : " + src.attr("abs:src"));
       }
     }
-  }*/
+  }
 }

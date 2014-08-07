@@ -24,6 +24,8 @@ public class LocalCover2Cover {
 	private String thumbnailFile;
 	
 	private List<String> imageUrls;
+	
+	private String errorMessage;
 
 	public String getPartNumber() {
 		return partNumber;
@@ -79,6 +81,14 @@ public class LocalCover2Cover {
 
 	public void setImageUrls(List<String> imageUrls) {
 		this.imageUrls = imageUrls;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 
 	@Override

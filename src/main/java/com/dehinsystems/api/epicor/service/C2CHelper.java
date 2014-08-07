@@ -3,6 +3,7 @@ package com.dehinsystems.api.epicor.service;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Vector;
 
 import com.ccitriad.catalog.CatalogException;
 import com.ccitriad.catalog.parts.LocalC2C;
@@ -17,6 +18,22 @@ public class C2CHelper {
 		PartCatalog partCatalog = new PartCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierID, EpicoreConstants.SERVICE_TYPE);
 		LocalC2C localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null, null, null);
 		return localC2C != null ? populateLocalCover2Cover(localC2C) : null;			
+	}
+	
+	public LocalCover2Cover getCoverToCoverDetailsFromPartNumber(final String supplierID, final String partNumber, final String mfgName, final String lineCode, final String orderNo) throws  UnknownHostException, IOException {
+		try {
+			PartCatalog partCatalog = new PartCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierID, EpicoreConstants.SERVICE_TYPE);
+			
+			Vector<String> orderNos = new Vector<String>(0);
+			orderNos.add(orderNo);
+			
+			LocalC2C localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null, orderNos, null);
+			return localC2C != null ? populateLocalCover2Cover(localC2C) : null;
+		} catch (CatalogException e) {
+			LocalCover2Cover error = new LocalCover2Cover();
+			error.setErrorMessage(e.getMessage());
+			return error;	
+		}
 	}
 
 	private LocalCover2Cover populateLocalCover2Cover(LocalC2C localC2C) throws IOException {

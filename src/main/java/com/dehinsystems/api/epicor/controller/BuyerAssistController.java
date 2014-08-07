@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ccitriad.catalog.CatalogException;
 import com.dehinsystems.api.epicor.model.BGManufactureInfo;
 import com.dehinsystems.api.epicor.model.BuyerGuildeDataVO;
-import com.dehinsystems.api.epicor.model.LocalCover2Cover;
-import com.dehinsystems.api.epicor.service.C2CHelper;
 import com.dehinsystems.api.epicor.service.ManufacturersHelper;
 import com.dehinsystems.api.epicor.util.EpicoreConstants;
 
@@ -36,16 +34,10 @@ public class BuyerAssistController {
 		ManufacturersHelper manufacturersHelper = new ManufacturersHelper();
 		try {
 			/**
-			 * Step 1,2: Fetch all the manufacturers and there coverage for given Part Number 
+			 * Step 1,2,3: Fetch all the manufacturers and there coverage for given Part Number, C2C information 
 			*/
 			List<BGManufactureInfo> manufacturers = manufacturersHelper.getAllManufacturerByPartNumber(supplierID, partNumber);
 			bgDataVO.setLstBgMfgInfos(manufacturers);
-			/**
-			 * Step 3: Fetch C2C information
-			 */
-			C2CHelper c2cHelper = new C2CHelper();
-			LocalCover2Cover cover2Cover = c2cHelper.getCoverToCoverDetailsFromPartNumber(supplierID, partNumber);
-			bgDataVO.setCover2CoverInfo(cover2Cover);
 		} catch (CatalogException | IOException e) {
 			if(e instanceof IOException) {
 				bgDataVO.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later.");
