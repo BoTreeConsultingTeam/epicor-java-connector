@@ -65,9 +65,9 @@ public class ManufacturersHelper {
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	public List<BGManufactureInfo> getAllManufacturerByPartNumber(final String supplierID, final String partNumber) throws CatalogException, UnknownHostException, IOException {
+	public List<BGManufactureInfo> getAllManufacturerByPartNumber(final String supplierID, final String partNumber) throws CatalogException, IOException {
 		List<BGManufactureInfo> bgManufactureInfos = new ArrayList<BGManufactureInfo>();
-		BGCatalog bgCatalog =new BGCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierID, EpicoreConstants.SERVICE_TYPE);
+		BGCatalog bgCatalog = new BGCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierID, EpicoreConstants.SERVICE_TYPE);
 		/**
 		 * Step 1: Get all the manufacturers for the provided part number.
 		 */
@@ -100,6 +100,7 @@ public class ManufacturersHelper {
 				bgManufactureInfos.add(bgManufactureInfo);
 			}
 		}
+		bgCatalog.DisconnectCatalogServer();
 		return bgManufactureInfos;
 	}
 
@@ -116,7 +117,7 @@ public class ManufacturersHelper {
 		return bgManufactureInfo;
 	}
 	
-	public ManufacturerDetails getBGDataWithMfg(final String supplierID, final String partNumber, final String orderNumber) throws UnknownHostException, CatalogException, IOException{
+	public ManufacturerDetails getBGDataWithMfg(final String supplierID, final String partNumber, final String orderNumber) throws CatalogException, IOException{
  		BGCatalog bgCatalog = new BGCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierID, EpicoreConstants.SERVICE_TYPE);
 		List<?> bgcataloglist = bgCatalog.GetBuyersGuideDataByVehEnhanced("0", "0", "0", "0", "0", null, partNumber, null, orderNumber);
 		List<CompatibilityInfo> bgDataInfos = new ArrayList<CompatibilityInfo>();
@@ -146,6 +147,7 @@ public class ManufacturersHelper {
 			mfgDetails = new ManufacturerDetails();
 		}
 		mfgDetails.setCompatibilityInfos(bgDataInfos);
+		bgCatalog.DisconnectCatalogServer();
 		return mfgDetails;
 	}
 	/**
@@ -177,8 +179,9 @@ public class ManufacturersHelper {
 	
 	public List<PricePartInfo> getPricesByMfgNameAndPartNumber(final String supplierID, final String mfgName, final String partNumber) throws UnknownHostException, IOException {
 		List<PricePartInfo> pricePartInfos = new ArrayList<PricePartInfo>(0);
+		MfgPricesCatalog pricesCatalog = null;
 		try{
-			MfgPricesCatalog pricesCatalog = new MfgPricesCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID, EpicoreConstants.USER_NAME, EpicoreConstants.PASSWORD, supplierID, EpicoreConstants.SERVICE_TYPE);
+			pricesCatalog = new MfgPricesCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID, EpicoreConstants.USER_NAME, EpicoreConstants.PASSWORD, supplierID, EpicoreConstants.SERVICE_TYPE);
 			List<?> items = pricesCatalog.MfgPricesInfo(mfgName, partNumber);
 			
 			for (Object object : items) {
@@ -192,6 +195,17 @@ public class ManufacturersHelper {
 			PricePartInfo pricePartInfo = new PricePartInfo();
 			pricePartInfo.setErrorMessage(e.getMessage());
 			pricePartInfos.add(pricePartInfo);
+		} finally{
+			if(pricesCatalog != null) {
+				try {
+					pricesCatalog.DisconnectCatalogServer();
+				} catch (CatalogException e) {
+					PricePartInfo pricePartInfo = new PricePartInfo();
+					pricePartInfo.setErrorMessage(e.getMessage());
+					pricePartInfos.add(pricePartInfo);
+				}
+			}
+			
 		}
 		return pricePartInfos;
 	}

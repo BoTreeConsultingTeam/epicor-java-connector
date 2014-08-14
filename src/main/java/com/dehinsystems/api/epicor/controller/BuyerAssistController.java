@@ -8,6 +8,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ccitriad.catalog.CatalogException;
@@ -20,8 +21,8 @@ import com.dehinsystems.api.epicor.util.EpicoreConstants;
 @RequestMapping("/bgdetails/")
 public class BuyerAssistController {
    	
-	@RequestMapping(value = "srchbgdata/{partNumber}/{supplierID}/", method = RequestMethod.GET, headers="Accept=application/json")
-	public BuyerGuildeDataVO getBuyerAssistDetails(@PathVariable String supplierID, @PathVariable String partNumber) {
+	@RequestMapping(value = "srchbgdata/{partNumber}", method = RequestMethod.GET, headers="Accept=application/json")
+	public BuyerGuildeDataVO getBuyerAssistDetails(@RequestParam(value = "supplierID", required = false) String supplierID, @PathVariable String partNumber) {
 		supplierID = StringUtils.isEmpty(supplierID) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierID;
 		BuyerGuildeDataVO bgDataVO = new BuyerGuildeDataVO();
 		bgDataVO.setPartNumber(partNumber);
@@ -46,13 +47,9 @@ public class BuyerAssistController {
 			if(e instanceof CatalogException) {
 				bgDataVO.setErrorMessage("Something wrong with ePartExpert System. Please report this to administrator - "+e.getMessage());
 			}
+		} finally {
+			manufacturersHelper = null;
 		}
 		return bgDataVO;
-	}
-    
-	public static void main(String[] args) {
-		BuyerAssistController buyerAssistController = new BuyerAssistController();
-		BuyerGuildeDataVO bgDataVO = buyerAssistController.getBuyerAssistDetails("TS", "EM-9045");
-		System.out.println(bgDataVO);
 	}
 }
