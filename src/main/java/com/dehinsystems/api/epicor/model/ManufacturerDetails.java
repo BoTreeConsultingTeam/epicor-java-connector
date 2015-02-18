@@ -19,6 +19,7 @@ public class ManufacturerDetails {
 	
 	private String partDescText;
 	
+
 	private String partDescID;
 	
 	private String lineCode;
@@ -30,6 +31,8 @@ public class ManufacturerDetails {
 	private LocalCover2Cover localCover2Cover;
 	
 	private List<PricePartInfo> pricePartInfos;
+	
+	private String errorMessage;
 	
 	public String getManufacturer() {
 		return manufacturer;
@@ -111,6 +114,13 @@ public class ManufacturerDetails {
 		this.pricePartInfos = pricePartInfos;
 	}
 
+	public String getErrorMessage() {
+		return errorMessage;
+	}
+	
+	public void setErrorMessage(String errorMessage) {
+		this.errorMessage = errorMessage;
+	}
 	@Override
 	public String toString() {
 		return "ManufacturerDetails [manufacturer=" + manufacturer
