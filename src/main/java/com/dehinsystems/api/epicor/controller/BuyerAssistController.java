@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ccitriad.catalog.CatalogException;
 import com.dehinsystems.api.epicor.model.BGManufactureInfo;
 import com.dehinsystems.api.epicor.model.BuyerGuildeDataVO;
+import com.dehinsystems.api.epicor.model.ManufacturerDetails;
+import com.dehinsystems.api.epicor.service.BuyerAssistHelper;
 import com.dehinsystems.api.epicor.service.ManufacturersHelper;
 import com.dehinsystems.api.epicor.util.EpicoreConstants;
 
@@ -51,5 +53,22 @@ public class BuyerAssistController {
 			manufacturersHelper = null;
 		}
 		return bgDataVO;
+	}
+	
+	@RequestMapping(value = "{partNumber}/{manufracturer}", method = RequestMethod.GET, headers="Accept=application/json")
+	public List<ManufacturerDetails> getBuyerAssisData(@RequestParam(value = "supplierID", required = false) String supplierID, @PathVariable String partNumber,String manufracturer){
+		
+		supplierID = StringUtils.isEmpty(supplierID) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierID;
+		List<ManufacturerDetails> mfgDetails =null;
+	
+		BuyerAssistHelper buyerAssistHelper = new BuyerAssistHelper();
+		try {
+			mfgDetails = buyerAssistHelper.getBuyerAssistData(partNumber, manufracturer);
+		} catch (CatalogException | IOException e) {
+			
+		}
+		
+		return mfgDetails;
+		
 	}
 }
