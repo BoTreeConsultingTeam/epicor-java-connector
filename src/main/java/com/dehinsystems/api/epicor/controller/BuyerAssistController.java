@@ -2,6 +2,7 @@ package com.dehinsystems.api.epicor.controller;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.util.StringUtils;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ccitriad.catalog.CatalogException;
 import com.dehinsystems.api.epicor.model.BGManufactureInfo;
 import com.dehinsystems.api.epicor.model.BuyerGuildeDataVO;
+import com.dehinsystems.api.epicor.model.CatalogItem;
 import com.dehinsystems.api.epicor.model.ManufacturerDetails;
 import com.dehinsystems.api.epicor.service.BuyerAssistHelper;
 import com.dehinsystems.api.epicor.service.ManufacturersHelper;
@@ -59,15 +61,20 @@ public class BuyerAssistController {
 	public List<ManufacturerDetails> getBuyerAssisData(@RequestParam(value = "supplierID", required = false) String supplierID, @PathVariable String partNumber,String manufracturer){
 		
 		supplierID = StringUtils.isEmpty(supplierID) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierID;
-		List<ManufacturerDetails> mfgDetails =null;
+		List<ManufacturerDetails> mfgDetails = new ArrayList<ManufacturerDetails>();;
 	
+		
 		BuyerAssistHelper buyerAssistHelper = new BuyerAssistHelper();
 		try {
 			mfgDetails = buyerAssistHelper.getBuyerAssistData(partNumber, manufracturer);
 		} catch (CatalogException | IOException e) {
 			
+			if(e instanceof IOException || e instanceof CatalogException) {
+				ManufacturerDetails manufacturerDetails = new ManufacturerDetails();
+				manufacturerDetails.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later");
+				mfgDetails.add(manufacturerDetails);
+			}
 		}
-		
 		return mfgDetails;
 		
 	}
