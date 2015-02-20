@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ccitriad.catalog.CatalogException;
 import com.dehinsystems.api.epicor.model.BGManufactureInfo;
 import com.dehinsystems.api.epicor.model.BuyerGuildeDataVO;
-import com.dehinsystems.api.epicor.model.CatalogItem;
 import com.dehinsystems.api.epicor.model.ManufacturerDetails;
 import com.dehinsystems.api.epicor.service.BuyerAssistHelper;
 import com.dehinsystems.api.epicor.service.ManufacturersHelper;
@@ -57,6 +56,12 @@ public class BuyerAssistController {
 		return bgDataVO;
 	}
 	
+	/**
+	 * @param supplierID
+	 * @param partNumber
+	 * @param manufracturer
+	 * @return Json  of buyerassist data for all manufractures for given partnumber
+	 */
 	@RequestMapping(value = "{partNumber}/{manufracturer}", method = RequestMethod.GET, headers="Accept=application/json")
 	public List<ManufacturerDetails> getBuyerAssisData(@RequestParam(value = "supplierID", required = false) String supplierID, @PathVariable String partNumber,String manufracturer){
 		
@@ -71,7 +76,7 @@ public class BuyerAssistController {
 			
 			if(e instanceof IOException || e instanceof CatalogException) {
 				ManufacturerDetails manufacturerDetails = new ManufacturerDetails();
-				manufacturerDetails.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later");
+				manufacturerDetails.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later-"+e.getMessage());
 				mfgDetails.add(manufacturerDetails);
 			}
 		}
