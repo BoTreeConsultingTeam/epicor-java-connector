@@ -14,24 +14,14 @@ import com.dehinsystems.api.epicor.model.ManufacturerDetails;
 import com.dehinsystems.api.epicor.util.EpicoreConstants;
 
 public class BuyerAssistHelper {
-	public static void main(String[] args) throws CatalogException, IOException {
-
-		BuyerAssistHelper assistHelper = new BuyerAssistHelper();
-		List<ManufacturerDetails> details = new ArrayList<ManufacturerDetails>();
-
-		details = assistHelper.getBuyerAssistData("EM9045", "CARQUEST/STANDARD MOTOR PRODUCTS");
-		
-		for(ManufacturerDetails mfgDetails:details){
-			System.out.println(mfgDetails.toString());
-		}
-	}
 
 	/**
 	 * @param partNumber
 	 * @param manufracturer
-	 * @return
+	 * @return List of {@link ManufacturerDetails}
 	 * @throws IOException 
 	 * @throws CatalogException 
+	 * The method returns list of manufracturer details for given partnumber and manufracturer.
 	 */
 	public List<ManufacturerDetails> getBuyerAssistData(String partNumber,String manufracturer) throws CatalogException, IOException {
 		
@@ -55,9 +45,10 @@ public class BuyerAssistHelper {
 
 	/**
 	 * @param partNumber
-	 * @return
+	 * @return list of manufracturer's name
 	 * @throws IOException 
 	 * @throws CatalogException 
+	 * The returns list of all manufracturer for given partnumber.
 	 */
 	public List<String> getManufactures(String partNumber) throws CatalogException, IOException {
 		ManufacturersHelper manufacturersHelper = new ManufacturersHelper();
@@ -75,9 +66,10 @@ public class BuyerAssistHelper {
 	/**
 	 * @param partNumber
 	 * @param manufacturer
-	 * @return
+	 * @return list of {@link ManufacturerDetails}
 	 * @throws CatalogException
 	 * @throws IOException
+	 * The method is used to get buyerassist data of all manufracturers for given  partnumber.
 	 */
 	public List<ManufacturerDetails> getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer) throws CatalogException, IOException {
 		
@@ -120,7 +112,7 @@ public class BuyerAssistHelper {
 
 	/**
 	 * @param dataItemEnhanced
-	 * @return
+	 * @return object of {@link CompatibilityInfo}
 	 */
 	private CompatibilityInfo populateBGData(BGDataItemEnhanced dataItemEnhanced) {
 		
