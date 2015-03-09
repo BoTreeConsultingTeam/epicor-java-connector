@@ -2,8 +2,8 @@ package com.dehinsystems.api.epicor.controller;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ccitriad.catalog.CatalogException;
 import com.dehinsystems.api.epicor.model.BGManufactureInfo;
-import com.dehinsystems.api.epicor.model.BuyerAssistInfo;
 import com.dehinsystems.api.epicor.model.BuyerGuildeDataVO;
+import com.dehinsystems.api.epicor.model.ManufacturerDetails;
 import com.dehinsystems.api.epicor.service.BuyerAssistHelper;
 import com.dehinsystems.api.epicor.service.ManufacturersHelper;
 import com.dehinsystems.api.epicor.util.EpicoreConstants;
@@ -55,30 +55,32 @@ public class BuyerAssistController {
 		}
 		return bgDataVO;
 	}
+	
 	/**
-	 * @param supplierId
+	 * @param supplierID
 	 * @param partNumber
 	 * @param manufracturer
-	 * @return BuyerAssistInfo object as json 
+	 * @return Json  of buyerassist data for all manufractures for given partnumber
 	 */
 	@RequestMapping(value = "{partNumber}/{manufracturer}", method = RequestMethod.GET, headers="Accept=application/json")
-	public BuyerAssistInfo getCompatibilityInfo(@RequestParam(value= "supplierID",required=false) String supplierId ,@PathVariable String partNumber,@PathVariable String manufracturer){
+	public List<ManufacturerDetails> getBuyerAssisData(@RequestParam(value = "supplierID", required = false) String supplierID, @PathVariable String partNumber,String manufracturer){
 		
-		supplierId = StringUtils.isEmpty(supplierId) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierId;
-		Vector<String> mfgVector = new Vector<String>();
-		mfgVector.add(manufracturer);
+		supplierID = StringUtils.isEmpty(supplierID) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierID;
+		List<ManufacturerDetails> mfgDetails = new ArrayList<ManufacturerDetails>();;
+	
 		
 		BuyerAssistHelper buyerAssistHelper = new BuyerAssistHelper();
-
-		BuyerAssistInfo buyerInfo = new BuyerAssistInfo() ;
 		try {
-			buyerInfo = buyerAssistHelper.getBuyerAssistAllMfg(partNumber, mfgVector);
+			mfgDetails = buyerAssistHelper.getBuyerAssistData(partNumber, manufracturer);
 		} catch (CatalogException | IOException e) {
+			
 			if(e instanceof IOException || e instanceof CatalogException) {
-				buyerInfo.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later-"+e.getMessage());
+				ManufacturerDetails manufacturerDetails = new ManufacturerDetails();
+				manufacturerDetails.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later-"+e.getMessage());
+				mfgDetails.add(manufacturerDetails);
 			}
 		}
+		return mfgDetails;
 		
-		return buyerInfo;
 	}
 }
