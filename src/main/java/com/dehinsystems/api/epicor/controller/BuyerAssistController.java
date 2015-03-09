@@ -19,7 +19,6 @@ import com.dehinsystems.api.epicor.model.BuyerGuildeDataVO;
 import com.dehinsystems.api.epicor.service.BuyerAssistHelper;
 import com.dehinsystems.api.epicor.service.ManufacturersHelper;
 import com.dehinsystems.api.epicor.util.EpicoreConstants;
-import com.sun.istack.internal.NotNull;
 
 @RestController
 @RequestMapping("bgdetails/")
@@ -63,7 +62,7 @@ public class BuyerAssistController {
 	 * @return BuyerAssistInfo object as json 
 	 */
 	@RequestMapping(value = "{partNumber}/{manufracturer}", method = RequestMethod.GET, headers="Accept=application/json")
-	public BuyerAssistInfo getCompatibilityInfo(@RequestParam(value= "supplierID",required=false) String supplierId ,@PathVariable String partNumber, @NotNull @PathVariable String manufracturer){
+	public BuyerAssistInfo getCompatibilityInfo(@RequestParam(value= "supplierID",required=false) String supplierId ,@PathVariable String partNumber, @PathVariable String manufracturer){
 		
 		supplierId = StringUtils.isEmpty(supplierId) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierId;
 		Vector<String> mfgVector = new Vector<String>();
