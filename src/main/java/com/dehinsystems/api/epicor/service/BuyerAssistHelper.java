@@ -8,38 +8,41 @@ import java.util.Vector;
 import com.ccitriad.catalog.CatalogException;
 import com.ccitriad.catalog.buyersGuide.BGCatalog;
 import com.ccitriad.catalog.buyersGuide.BGDataItemEnhanced;
+import com.ccitriad.catalog.parts.LocalC2C;
+import com.ccitriad.catalog.parts.PartCatalog;
 import com.dehinsystems.api.epicor.model.BGManufactureInfo;
+import com.dehinsystems.api.epicor.model.BuyerAssistInfo;
 import com.dehinsystems.api.epicor.model.CompatibilityInfo;
-import com.dehinsystems.api.epicor.model.ManufacturerDetails;
 import com.dehinsystems.api.epicor.util.EpicoreConstants;
+import com.dehinsystems.api.epicor.util.HtmlScrapper;
 
 public class BuyerAssistHelper {
 
 	/**
 	 * @param partNumber
 	 * @param manufracturer
-	 * @return List of {@link ManufacturerDetails}
+	 * @return List of {@link BuyerAssistInfo}
 	 * @throws IOException 
 	 * @throws CatalogException 
 	 * The method returns list of manufracturer details for given partnumber and manufracturer.
 	 */
-	public List<ManufacturerDetails> getBuyerAssistData(String partNumber,String manufracturer) throws CatalogException, IOException {
+	public BuyerAssistInfo getBuyerAssistData(String partNumber,String manufracturer) throws CatalogException, IOException {
 		
 		BuyerAssistHelper assistHelper = new BuyerAssistHelper();
 		
 		Vector<String> mfgVector = new Vector<String>();
 		
-		List<ManufacturerDetails> buyerDetailList = new ArrayList<ManufacturerDetails>();
+		BuyerAssistInfo buyerAssistInfo = new BuyerAssistInfo();
 		
 			List<String> mfgList = assistHelper.getManufactures(partNumber);
 			for (String mfgName : mfgList) {
 				if (mfgName.trim().equalsIgnoreCase(manufracturer.trim())) {
 					mfgVector.add(mfgName.trim());
-					buyerDetailList = assistHelper.getBuyerAssistAllMfg(partNumber, mfgVector);
+					buyerAssistInfo = assistHelper.getBuyerAssistAllMfg(partNumber, mfgVector);
 					break;
 				}
 			}
-		return buyerDetailList;
+		return buyerAssistInfo;
 
 	}
 
@@ -48,7 +51,7 @@ public class BuyerAssistHelper {
 	 * @return list of manufracturer's name
 	 * @throws IOException 
 	 * @throws CatalogException 
-	 * The returns list of all manufracturer for given partnumber.
+	 * This returns list of all manufracturer for given partnumber.
 	 */
 	public List<String> getManufactures(String partNumber) throws CatalogException, IOException {
 		ManufacturersHelper manufacturersHelper = new ManufacturersHelper();
@@ -66,48 +69,64 @@ public class BuyerAssistHelper {
 	/**
 	 * @param partNumber
 	 * @param manufacturer
-	 * @return list of {@link ManufacturerDetails}
+	 * @return list of {@link BuyerAssistInfo}
 	 * @throws CatalogException
 	 * @throws IOException
 	 * The method is used to get buyerassist data of all manufracturers for given  partnumber.
 	 */
-	public List<ManufacturerDetails> getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer) throws CatalogException, IOException {
+	public BuyerAssistInfo getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer) throws CatalogException, IOException {
+		
+		PartCatalog partCatalog = new PartCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,EpicoreConstants.DEFAULT_SUPPLIER_ID, EpicoreConstants.SERVICE_TYPE);
+		LocalC2C localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null, null, null);
+		List<String> imageUrls = HtmlScrapper.fetchImageUrls(localC2C.getC2CURL());
+		partCatalog.DisconnectCatalogServer();
 		
 		BGCatalog bgCatalog = new BGCatalog(EpicoreConstants.HOST_IP,EpicoreConstants.DOMAIN_ID, EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,EpicoreConstants.DEFAULT_SUPPLIER_ID,EpicoreConstants.SERVICE_TYPE);
+		List<CompatibilityInfo> bgDataInfoList = new ArrayList<CompatibilityInfo>();
 		
 		List<?> bgcataloglist = bgCatalog.GetBuyersGuideDataEnhanced(partNumber, manufacturer);
-		List<CompatibilityInfo> bgDataInfos = new ArrayList<CompatibilityInfo>();
-		List<ManufacturerDetails> mfgList = new ArrayList<ManufacturerDetails>();
+		List<BuyerAssistInfo> buyerAssistList = new ArrayList<BuyerAssistInfo>();
 		
-		ManufacturerDetails mfgDetails = null;
+		BuyerAssistInfo buyerAssistInfo = null;
 		
+		buyerAssistInfo = saveBuyerAssisInfo(imageUrls, bgDataInfoList,
+				bgcataloglist, buyerAssistList, buyerAssistInfo);
+		bgCatalog.DisconnectCatalogServer();
+		return buyerAssistInfo;
+	}
+
+	private BuyerAssistInfo saveBuyerAssisInfo(List<String> imageUrls,
+			List<CompatibilityInfo> bgDataInfoList, List<?> bgcataloglist,
+			List<BuyerAssistInfo> buyerAssistList,
+			BuyerAssistInfo buyerAssistInfo) {
+		
+		CompatibilityInfo bgDataInfos;
 		for (Object object : bgcataloglist) {
 			
-			if (object instanceof BGDataItemEnhanced) {
+			if (object instanceof BGDataItemEnhanced) {  
 				
 				BGDataItemEnhanced dataItemEnhanced = (BGDataItemEnhanced) object;
 				/**
 				 * This would remove repetitive data coming from response
 				 */
-				mfgDetails = new ManufacturerDetails();
-				mfgDetails.setManufacturer(dataItemEnhanced.getManufacturerName());
-				mfgDetails.setGroupText(dataItemEnhanced.getGroupText());
-				mfgDetails.setGroupNumber(dataItemEnhanced.getGroupNumber());
-				mfgDetails.setPartDescText(dataItemEnhanced.getPartDescriptionText());
-				mfgDetails.setPartDescID(dataItemEnhanced.getPartDescriptionID());
-				mfgDetails.setLineCode(dataItemEnhanced.getLineCode());
-				mfgDetails.setOrderNumber(dataItemEnhanced.getOrderNumber());
-
-				CompatibilityInfo dataInfo = populateBGData(dataItemEnhanced);
+				if (buyerAssistInfo == null) {
+					buyerAssistInfo = new BuyerAssistInfo();
+					buyerAssistInfo.setManufacturer(dataItemEnhanced.getManufacturerName());
+					buyerAssistInfo.setGroupText(dataItemEnhanced.getGroupText());
+					buyerAssistInfo.setGroupNumber(dataItemEnhanced.getGroupNumber());
+					buyerAssistInfo.setPartDescText(dataItemEnhanced.getPartDescriptionText());
+					buyerAssistInfo.setPartDescID(dataItemEnhanced.getPartDescriptionID());
+				}
 				
-				bgDataInfos.add(dataInfo);
-				mfgDetails.setCompatibilityInfos(bgDataInfos);
-				mfgList.add(mfgDetails);
+				bgDataInfos = populateBGData(dataItemEnhanced);
+				bgDataInfoList.add(bgDataInfos);
+				
+				buyerAssistInfo.setCompatibilityInfo(bgDataInfoList);
+				buyerAssistInfo.setImageUrls(imageUrls);
+				buyerAssistList.add(buyerAssistInfo);
 			}
 		}
-
-		bgCatalog.DisconnectCatalogServer();
-		return mfgList;
+		return buyerAssistInfo;
 	}
 
 	/**
@@ -137,4 +156,6 @@ public class BuyerAssistHelper {
 		dataInfo.setToYear(dataItemEnhanced.getToYear());
 		return dataInfo;
 	}
+	
+
 }
