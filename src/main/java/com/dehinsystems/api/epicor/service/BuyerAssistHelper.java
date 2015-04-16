@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.ccitriad.catalog.CatalogException;
 import com.ccitriad.catalog.buyersGuide.BGCatalog;
 import com.ccitriad.catalog.buyersGuide.BGDataItemEnhanced;
@@ -100,6 +102,7 @@ public class BuyerAssistHelper {
 			List<BuyerAssistInfo> buyerAssistList,
 			BuyerAssistInfo buyerAssistInfo) {
 		
+
 		CompatibilityInfo bgDataInfos;
 		for (Object object : bgcataloglist) {
 			
@@ -111,11 +114,13 @@ public class BuyerAssistHelper {
 				 */
 				if (buyerAssistInfo == null) {
 					buyerAssistInfo = new BuyerAssistInfo();
-					buyerAssistInfo.setManufacturer(dataItemEnhanced.getManufacturerName());
-					buyerAssistInfo.setGroupText(dataItemEnhanced.getGroupText());
-					buyerAssistInfo.setGroupNumber(dataItemEnhanced.getGroupNumber());
-					buyerAssistInfo.setPartDescText(dataItemEnhanced.getPartDescriptionText());
-					buyerAssistInfo.setPartDescID(dataItemEnhanced.getPartDescriptionID());
+					buyerAssistInfo.setManufacturer(StringUtils.trimToEmpty(dataItemEnhanced.getManufacturerName()));
+					buyerAssistInfo.setGroupText(StringUtils.trimToEmpty(dataItemEnhanced.getGroupText()));
+					buyerAssistInfo.setGroupNumber(StringUtils.trimToEmpty(dataItemEnhanced.getGroupNumber()));
+					buyerAssistInfo.setPartDescText(StringUtils.trimToEmpty(dataItemEnhanced.getPartDescriptionText()));
+					buyerAssistInfo.setPartDescID(StringUtils.trimToEmpty(dataItemEnhanced.getPartDescriptionID()));
+					buyerAssistInfo.setLineCode(StringUtils.trimToEmpty(dataItemEnhanced.getLineCode()));
+					buyerAssistInfo.setOrderNumber(StringUtils.trimToEmpty(dataItemEnhanced.getOrderNumber()));
 				}
 				
 				bgDataInfos = populateBGData(dataItemEnhanced);
@@ -136,24 +141,24 @@ public class BuyerAssistHelper {
 	private CompatibilityInfo populateBGData(BGDataItemEnhanced dataItemEnhanced) {
 		
 		CompatibilityInfo dataInfo = new CompatibilityInfo();
-		dataInfo.setAddDate(dataItemEnhanced.getAddDate());
-		dataInfo.setDetailsText(dataItemEnhanced.getDetailsText());
-		dataInfo.setEngineCode(dataItemEnhanced.getEngineCodeOfVehicle());
-		dataInfo.setEngineText(dataItemEnhanced.getEngineOfVehicle());
-		dataInfo.setFromYear(dataItemEnhanced.getFromYear());
-		dataInfo.setAddDate(dataItemEnhanced.getAddDate());
-		dataInfo.setLineDescription(dataItemEnhanced.getLineDescription());
-		dataInfo.setMakeCode(dataItemEnhanced.getMakeCodeOfVehicle());
-		dataInfo.setMakeText(dataItemEnhanced.getMakeOfVehicle());
-		dataInfo.setModelCode(dataItemEnhanced.getModelCodeOfVehicle());
-		dataInfo.setModelText(dataItemEnhanced.getModelOfVehicle());
-		dataInfo.setNumApps(dataItemEnhanced.getNumberOfApplication());
-		dataInfo.setPerCarQty(dataItemEnhanced.getPerVehicleQuantity());
-		dataInfo.setSpecCode1(dataItemEnhanced.getSpecCode1());
-		dataInfo.setSpecCode2(dataItemEnhanced.getSpecCode2());
-		dataInfo.setSpecCode3(dataItemEnhanced.getSpecCode3());
-		dataInfo.setSpecCode4(dataItemEnhanced.getSpecCode4());
-		dataInfo.setToYear(dataItemEnhanced.getToYear());
+		
+		dataInfo.setFromYear(StringUtils.trimToEmpty(dataItemEnhanced.getFromYear()));
+		dataInfo.setToYear(StringUtils.trimToEmpty(dataItemEnhanced.getToYear()));
+		dataInfo.setNumApps(StringUtils.trimToEmpty(dataItemEnhanced.getNumberOfApplication()));
+		dataInfo.setPerCarQty(StringUtils.trimToEmpty(dataItemEnhanced.getPerVehicleQuantity()));
+		dataInfo.setAddDate(StringUtils.trimToEmpty(dataItemEnhanced.getAddDate()));
+		dataInfo.setMakeText(StringUtils.trimToEmpty(dataItemEnhanced.getMakeOfVehicle()));
+		dataInfo.setMakeCode(StringUtils.trimToEmpty(dataItemEnhanced.getMakeCodeOfVehicle()));
+		dataInfo.setModelText(StringUtils.trimToEmpty(dataItemEnhanced.getModelOfVehicle()));
+		dataInfo.setModelCode(StringUtils.trimToEmpty(dataItemEnhanced.getModelCodeOfVehicle()));
+		dataInfo.setEngineText(StringUtils.trimToEmpty(dataItemEnhanced.getEngineOfVehicle()));
+		dataInfo.setEngineCode(StringUtils.trimToEmpty(dataItemEnhanced.getEngineCodeOfVehicle()));
+		dataInfo.setSpecCode1(StringUtils.trimToEmpty(dataItemEnhanced.getSpecCode1()));
+		dataInfo.setSpecCode2(StringUtils.trimToEmpty(dataItemEnhanced.getSpecCode2()));
+		dataInfo.setSpecCode3(StringUtils.trimToEmpty(dataItemEnhanced.getSpecCode3()));
+		dataInfo.setSpecCode4(StringUtils.trimToEmpty(dataItemEnhanced.getSpecCode4()));
+		dataInfo.setDetailsText(StringUtils.trimToEmpty(dataItemEnhanced.getDetailsText()));
+		dataInfo.setLineDescription(StringUtils.trimToEmpty(dataItemEnhanced.getLineDescription()));
 		return dataInfo;
 	}
 	
