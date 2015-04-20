@@ -76,11 +76,19 @@ public class BuyerAssistHelper {
 	 * @throws IOException
 	 * The method is used to get buyerassist data of all manufracturers for given  partnumber.
 	 */
-	public BuyerAssistInfo getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer) throws CatalogException, IOException {
+	public BuyerAssistInfo getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer) throws IOException, CatalogException {
 		
 		PartCatalog partCatalog = new PartCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,EpicoreConstants.DEFAULT_SUPPLIER_ID, EpicoreConstants.SERVICE_TYPE);
-		LocalC2C localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null, null, null);
-		List<String> imageUrls = HtmlScrapper.fetchImageUrls(localC2C.getC2CURL());
+		LocalC2C localC2C = new LocalC2C();
+		List<String> imageUrls = new ArrayList<String>();
+		
+		try {
+			localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null,null, null);
+			imageUrls = HtmlScrapper.fetchImageUrls(localC2C.getC2CURL());
+		} catch (CatalogException e) {
+			imageUrls = HtmlScrapper.fetchImageUrls(EpicoreConstants.EMPTY);
+		}
+				
 		partCatalog.DisconnectCatalogServer();
 		
 		BGCatalog bgCatalog = new BGCatalog(EpicoreConstants.HOST_IP,EpicoreConstants.DOMAIN_ID, EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,EpicoreConstants.DEFAULT_SUPPLIER_ID,EpicoreConstants.SERVICE_TYPE);
@@ -97,10 +105,8 @@ public class BuyerAssistHelper {
 		return buyerAssistInfo;
 	}
 
-	private BuyerAssistInfo saveBuyerAssisInfo(List<String> imageUrls,
-			List<CompatibilityInfo> bgDataInfoList, List<?> bgcataloglist,
-			List<BuyerAssistInfo> buyerAssistList,
-			BuyerAssistInfo buyerAssistInfo) {
+	private BuyerAssistInfo saveBuyerAssisInfo(List<String> imageUrls,List<CompatibilityInfo> bgDataInfoList, List<?> bgcataloglist,
+			List<BuyerAssistInfo> buyerAssistList,BuyerAssistInfo buyerAssistInfo) {
 		
 
 		CompatibilityInfo bgDataInfos;
