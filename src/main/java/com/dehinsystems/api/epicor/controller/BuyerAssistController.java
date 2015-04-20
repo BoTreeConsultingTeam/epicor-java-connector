@@ -61,26 +61,28 @@ public class BuyerAssistController {
 	 * @param manufracturer
 	 * @return BuyerAssistInfo object as json 
 	 */
-	@RequestMapping(value = "{partNumber}/{manufracturer}", method = RequestMethod.GET, headers="Accept=application/json")
-	public BuyerAssistInfo getCompatibilityInfo(@RequestParam(value= "supplierID",required=false) String supplierId ,@PathVariable String partNumber, @PathVariable String manufracturer){
+	@RequestMapping(value = "{partNumber}", method = RequestMethod.GET, headers="Accept=application/json")
+	public BuyerAssistInfo getCompatibilityInfo(@RequestParam(value= "supplierID",required=false) String supplierId ,
+			@PathVariable String partNumber,@RequestParam(value= "mfg",required=true) String manufracturer ){
 		
 		supplierId = StringUtils.isEmpty(supplierId) ? EpicoreConstants.DEFAULT_SUPPLIER_ID : supplierId;
-		Vector<String> mfgVector = new Vector<String>();
-		mfgVector.add(manufracturer);
 		
-		BuyerAssistHelper buyerAssistHelper = new BuyerAssistHelper();
-
 		BuyerAssistInfo buyerInfo = new BuyerAssistInfo() ;
+
 		try {
-			if(StringUtils.isEmpty(manufracturer)){
-				buyerInfo.setErrorMessage("Please enter Manufacturer name");
-				return buyerInfo;
-			}
-			buyerInfo = buyerAssistHelper.getBuyerAssistAllMfg(partNumber, mfgVector);
+				if (StringUtils.isEmpty(manufracturer)) {
+					buyerInfo.setErrorMessage("Please enter Manufacturer name");
+					return buyerInfo;
+				}
+			Vector<String> mfgVector = new Vector<String>();
+			mfgVector.add(manufracturer);
+			
+			BuyerAssistHelper buyerAssistHelper = new BuyerAssistHelper();
+			buyerInfo = buyerAssistHelper.getBuyerAssistAllMfg(partNumber,mfgVector);
+			
+			
 		} catch (CatalogException | IOException e) {
-			if(e instanceof IOException || e instanceof CatalogException) {
-				buyerInfo.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later-"+e.getMessage());
-			}
+				buyerInfo.setErrorMessage("Something wrong with ePartExpert Connections. Please try again later-"+ e.getMessage());
 		}
 		
 		return buyerInfo;
