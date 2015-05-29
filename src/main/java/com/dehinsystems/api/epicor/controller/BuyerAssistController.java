@@ -78,7 +78,7 @@ public class BuyerAssistController {
 			mfgVector.add(manufracturer);
 			
 			BuyerAssistHelper buyerAssistHelper = new BuyerAssistHelper();
-			buyerInfo = buyerAssistHelper.getBuyerAssistAllMfg(partNumber,mfgVector);
+			buyerInfo = buyerAssistHelper.getBuyerAssistAllMfg(partNumber,mfgVector,supplierId);
 			
 			
 		} catch (CatalogException | IOException e) {

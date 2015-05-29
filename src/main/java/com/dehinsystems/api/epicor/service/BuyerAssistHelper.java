@@ -1,6 +1,7 @@
 package com.dehinsystems.api.epicor.service;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -40,7 +41,7 @@ public class BuyerAssistHelper {
 			for (String mfgName : mfgList) {
 				if (mfgName.trim().equalsIgnoreCase(manufracturer.trim())) {
 					mfgVector.add(mfgName.trim());
-					buyerAssistInfo = assistHelper.getBuyerAssistAllMfg(partNumber, mfgVector);
+					buyerAssistInfo = assistHelper.getBuyerAssistAllMfg(partNumber, mfgVector,EpicoreConstants.DEFAULT_SUPPLIER_ID);
 					break;
 				}
 			}
@@ -68,33 +69,30 @@ public class BuyerAssistHelper {
 		return mfgList;
 	}
 
+
 	/**
 	 * @param partNumber
 	 * @param manufacturer
-	 * @return list of {@link BuyerAssistInfo}
-	 * @throws CatalogException
+	 * @param supplierId
+	 * @return
 	 * @throws IOException
-	 * The method is used to get buyerassist data of all manufracturers for given  partnumber.
+	 * @throws CatalogException
 	 */
-	public BuyerAssistInfo getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer) throws IOException, CatalogException {
+	public BuyerAssistInfo getBuyerAssistAllMfg(String partNumber,Vector<String> manufacturer,String supplierId) throws IOException, CatalogException {
 		
-		PartCatalog partCatalog = new PartCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,EpicoreConstants.DEFAULT_SUPPLIER_ID, EpicoreConstants.SERVICE_TYPE);
-		LocalC2C localC2C = new LocalC2C();
-		List<String> imageUrls = new ArrayList<String>();
+		List<String> imageUrls = getImageUrlByPartNumber(partNumber, supplierId);
 		
-		try {
-			localC2C = partCatalog.GraphicLocalC2CRequest(partNumber, null,null, null);
-			imageUrls = HtmlScrapper.fetchImageUrls(localC2C.getC2CURL());
-		} catch (CatalogException e) {
-			imageUrls = HtmlScrapper.fetchImageUrls(EpicoreConstants.EMPTY);
-		}
-				
-		partCatalog.DisconnectCatalogServer();
-		
-		BGCatalog bgCatalog = new BGCatalog(EpicoreConstants.HOST_IP,EpicoreConstants.DOMAIN_ID, EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,EpicoreConstants.DEFAULT_SUPPLIER_ID,EpicoreConstants.SERVICE_TYPE);
+		BGCatalog bgCatalog = new BGCatalog(EpicoreConstants.HOST_IP,EpicoreConstants.DOMAIN_ID, EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierId,EpicoreConstants.SERVICE_TYPE);
 		List<CompatibilityInfo> bgDataInfoList = new ArrayList<CompatibilityInfo>();
 		
-		List<?> bgcataloglist = bgCatalog.GetBuyersGuideDataEnhanced(partNumber, manufacturer);
+		List<?> bgcataloglist = new ArrayList<>();
+		
+		if(!bgCatalog.GetBuyersGuideAvailableManufacturer(partNumber, EpicoreConstants.EMPTY, EpicoreConstants.EMPTY).isEmpty()){
+			bgcataloglist = bgCatalog.GetBuyersGuideDataEnhanced(partNumber, manufacturer);
+		}else{
+			bgcataloglist = null;
+		}
+
 		List<BuyerAssistInfo> buyerAssistList = new ArrayList<BuyerAssistInfo>();
 		
 		BuyerAssistInfo buyerAssistInfo = null;
@@ -105,6 +103,41 @@ public class BuyerAssistHelper {
 		return buyerAssistInfo;
 	}
 
+	/**
+	 * @param partNumber
+	 * @param supplierId
+	 * @return
+	 * @throws CatalogException
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 */
+	private List<String> getImageUrlByPartNumber(String partNumber,
+			String supplierId) throws CatalogException, UnknownHostException,
+			IOException {
+		PartCatalog partCatalog = new PartCatalog(EpicoreConstants.HOST_IP, EpicoreConstants.DOMAIN_ID,EpicoreConstants.USER_NAME,EpicoreConstants.PASSWORD,supplierId, EpicoreConstants.SERVICE_TYPE);
+		LocalC2C localC2C = new LocalC2C();
+		List<String> imageUrls = new ArrayList<String>();
+		
+		try {
+			localC2C =
+					partCatalog.GraphicLocalC2CRequest(partNumber, null,null, null);
+			imageUrls = HtmlScrapper.fetchImageUrls(localC2C.getC2CURL());
+		} catch (CatalogException e) {
+			imageUrls = HtmlScrapper.fetchImageUrls(EpicoreConstants.EMPTY);
+		}
+				
+		partCatalog.DisconnectCatalogServer();
+		return imageUrls;
+	}
+
+	/**
+	 * @param imageUrls
+	 * @param bgDataInfoList
+	 * @param bgcataloglist
+	 * @param buyerAssistList
+	 * @param buyerAssistInfo
+	 * @return
+	 */
 	private BuyerAssistInfo saveBuyerAssisInfo(List<String> imageUrls,List<CompatibilityInfo> bgDataInfoList, List<?> bgcataloglist,
 			List<BuyerAssistInfo> buyerAssistList,BuyerAssistInfo buyerAssistInfo) {
 		
